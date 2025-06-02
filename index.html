@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ Футбольная Викторина "Один шанс!"</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --dark: #292F36;
+            --light: #F7FFF7;
+            --accent: #FFE66D;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark), #1a1a2e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            background: rgba(255,255,255,0.1);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .quiz-container {
+            background: rgba(41, 47, 54, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            line-height: 1.4;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .option:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        
+        .option:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .result {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .correct {
+            background: linear-gradient(90deg, rgba(46, 204, 113, 0.3), rgba(46, 204, 113, 0.6));
+            border-color: #2ecc71;
+            color: white;
+        }
+        
+        .incorrect {
+            background: linear-gradient(90deg, rgba(231, 76, 60, 0.3), rgba(231, 76, 60, 0.6));
+            border-color: #e74c3c;
+            color: white;
+        }
+        
+        .next-btn, .restart-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .next-btn {
+            background: linear-gradient(90deg, var(--secondary), #48d1cc);
+            color: var(--dark);
+        }
+        
+        .next-btn:hover {
+            background: linear-gradient(90deg, #48d1cc, var(--secondary));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+        
+        .restart-btn {
+            background: linear-gradient(90deg, var(--primary), #ff8e8e);
+            color: white;
+        }
+        
+        .restart-btn:hover {
+            background: linear-gradient(90deg, #ff8e8e, var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .title-screen {
+            text-align: center;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+        }
+        
+        .start-btn {
+            background: linear-gradient(90deg, var(--accent), #ffd700);
+            color: var(--dark);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 230, 109, 0.4);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 230, 109, 0.6);
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--primary), var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .final-screen {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        
+        .final-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .final-score {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .trophy {
+            font-size: 5rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .achievement-title {
+            font-size: 1.8rem;
+            margin: 20px 0;
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--dark);
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            opacity: 0;
+            animation: confetti 5s ease-in-out infinite;
+            z-index: 1000;
+        }
+        
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .one-chance {
+            background: rgba(231, 76, 60, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid rgba(231, 76, 60, 0.5);
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+            
+            .options {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .title {
+                font-size: 3.5rem;
+            }
+            
+            .question {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Стартовый экран -->
+        <div class="title-screen" id="title-screen">
+            <img src="https://cdn-icons-png.flaticon.com/512/4498/4498011.png" alt="Футбольный мяч" class="logo">
+            <h1 class="title">Футбольная Викторина</h1>
+            <p class="subtitle">Один шанс доказать, что ты настоящий эксперт!</p>
+            <div class="one-chance">⚠️ У тебя только одна попытка! ⚠️</div>
+            <button class="start-btn" id="start-btn">Начать игру</button>
+        </div>
+        
+        <!-- Игровой экран -->
+        <div id="game-screen" style="display: none;">
+            <header>
+                <img src="https://cdn-icons-png.flaticon.com/512/4498/4498011.png" alt="Футбольный мяч" class="logo">
+                <h1>⚽ Один шанс! ⚽</h1>
+            </header>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            
+            <div class="score-container">
+                <span>Счет: <strong id="score">0</strong></span>
+                <span>Вопрос: <strong id="current">1</strong>/<strong id="total">0</strong></span>
+            </div>
+            
+            <div class="quiz-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="result" id="result"></div>
+                <button class="next-btn" id="next-btn">Следующий вопрос →</button>
+            </div>
+        </div>
+        
+        <!-- Финальный экран -->
+        <div class="final-screen" id="final-screen">
+            <div class="trophy">🏆</div>
+            <h2 class="final-title">Твой результат!</h2>
+            <p class="final-score">Правильных ответов: <strong id="final-score">0</strong> из <strong id="final-total">0</strong></p>
+            <div id="achievement"></div>
+            <button class="restart-btn" id="restart-btn">Посмотреть результат</button>
+        </div>
+    </div>
+
+    <script>
+        // Вопросы для викторины (40+ вопросов)
+        const questions = [
+            {
+                question: "Какой клуб выиграл Лигу чемпионов УЕФА в 2023 году?",
+                options: ["Реал Мадрид", "Манчестер Сити", "Челси", "Бавария"],
+                answer: 1
+            },
+            {
+                question: "Кто является лучшим бомбардиром в истории Лиги чемпионов?",
+                options: ["Лионель Месси", "Криштиану Роналду", "Роберт Левандовски", "Рауль"],
+                answer: 1
+            },
+            {
+                question: "Какой клуб называют 'Старая Синьора'?",
+                options: ["Интер", "Милан", "Ювентус", "Рома"],
+                answer: 2
+            },
+            {
+                question: "Сколько раз сборная Бразилии выигрывала Чемпионат мира?",
+                options: ["3", "4", "5", "6"],
+                answer: 2
+            },
+            {
+                question: "Кто забил 'Руку Бога' на ЧМ-1986?",
+                options: ["Диего Марадона", "Лионель Месси", "Габриэль Батистута", "Диего Форлан"],
+                answer: 0
+            },
+            {
+                question: "Какой стадион является домашним для 'Барселоны'?",
+                options: ["Сантьяго Бернабеу", "Камп Ноу", "Ванда Метрополитано", "Местилья"],
+                answer: 1
+            },
+            {
+                question: "Кто единственный футболист, выигравший 5 Лиг чемпионов подряд?",
+                options: ["Пако Хенто", "Криштиану Роналду", "Лионель Месси", "Зинедин Зидан"],
+                answer: 0
+            },
+            {
+                question: "Какой трансфер стал самым дорогим в истории футбола?",
+                options: ["Неймар в ПСЖ", "Криштиану Роналду в Ювентус", "Килиан Мбаппе в Реал", "Филипе Коутиньо в Барселону"],
+                answer: 0
+            },
+            {
+                question: "Какой клуб имеет прозвище 'Королевский клуб'?",
+                options: ["Барселона", "Реал Мадрид", "Атлетико Мадрид", "Валенсия"],
+                answer: 1
+            },
+            {
+                question: "Кто является автором 'феномена' (удар через себя в падении)?",
+                options: ["Пеле", "Диего Марадона", "Зико", "Леонидас"],
+                answer: 0
+            },
+            {
+                question: "Какой клуб выиграл АПЛ в сезоне 2023/24?",
+                options: ["Арсенал", "Ливерпуль", "Манчестер Сити", "Челси"],
+                answer: 2
+            },
+            {
+                question: "Кто забил самый быстрый гол в истории Лиги чемпионов (10.2 сек)?",
+                options: ["Рой Макай", "Гарет Бейл", "Златан Ибрагимович", "Криштиану Роналду"],
+                answer: 0
+            },
+            {
+                question: "Какой игрок получил прозвище 'Король'?",
+                options: ["Пеле", "Диего Марадона", "Йохан Кройф", "Ференц Пушкаш"],
+                answer: 0
+            },
+            {
+                question: "Какой клуб является рекордсменом по количеству титулов в Серии А?",
+                options: ["Милан", "Интер", "Ювентус", "Рома"],
+                answer: 2
+            },
+            {
+                question: "Кто является лучшим бомбардиром в истории сборной Бразилии?",
+                options: ["Пеле", "Роналдо", "Неймар", "Ромарио"],
+                answer: 2
+            },
+            {
+                question: "Какой клуб выиграл 'золотой дубль' (лига + ЛЧ) в сезоне 2022/23?",
+                options: ["Реал Мадрид", "Манчестер Сити", "Бавария", "Ливерпуль"],
+                answer: 1
+            },
+            {
+                question: "Кто является автором 'щучки' (удар через себя в падении)?",
+                options: ["Зинедин Зидан", "Денис Бергкамп", "Эрик Кантона", "Олег Саленко"],
+                answer: 1
+            },
+            {
+                question: "Какой клуб имеет прозвище 'Горшки'?",
+                options: ["Челси", "Тоттенхэм", "Арсенал", "Манчестер Юнайтед"],
+                answer: 0
+            },
+            {
+                question: "Кто является рекордсменом по количеству матчей в Ла Лиге?",
+                options: ["Андрес Иньеста", "Лионель Месси", "Рауль", "Сантильяна"],
+                answer: 3
+            },
+            {
+                question: "Какой стадион называют 'Театр мечты'?",
+                options: ["Энфилд", "Олд Траффорд", "Стэмфорд Бридж", "Эмирейтс"],
+                answer: 1
+            }
+        ];
+
+        // Элементы DOM
+        const titleScreen = document.getElementById('title-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const finalScreen = document.getElementById('final-screen');
+        const startBtn = document.getElementById('start-btn');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const resultElement = document.getElementById('result');
+        const nextButton = document.getElementById('next-btn');
+        const scoreElement = document.getElementById('score');
+        const currentElement = document.getElementById('current');
+        const totalElement = document.getElementById('total');
+        const progressBar = document.getElementById('progress');
+        const restartButton = document.getElementById('restart-btn');
+        const finalScoreElement = document.getElementById('final-score');
+        const finalTotalElement = document.getElementById('final-total');
+        const achievementElement = document.getElementById('achievement');
+
+        // Переменные викторины
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizCompleted = false;
+        let hasPlayed = localStorage.getItem('hasPlayed') === 'true';
+
+        // Проверить, играл ли уже пользователь
+        if (hasPlayed) {
+            showFinalScreen();
+        }
+
+        // Инициализация викторины
+        function initQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            quizCompleted = false;
+            scoreElement.textContent = score;
+            currentElement.textContent = currentQuestionIndex + 1;
+            totalElement.textContent = questions.length;
+            showQuestion();
+            
+            // Перемешать вопросы
+            shuffleQuestions();
+            
+            // Запомнить, что пользователь начал игру
+            localStorage.setItem('hasPlayed', 'true');
+        }
+
+        // Показать финальный экран
+        function showFinalScreen() {
+            titleScreen.style.display = 'none';
+            gameScreen.style.display = 'none';
+            finalScreen.style.display = 'block';
+            
+            // Загрузить сохраненный результат
+            const savedScore = localStorage.getItem('quizScore');
+            const savedTotal = localStorage.getItem('quizTotal');
+            const savedAchievement = localStorage.getItem('quizAchievement');
+            
+            if (savedScore && savedTotal) {
+                finalScoreElement.textContent = savedScore;
+                finalTotalElement.textContent = savedTotal;
+                achievementElement.innerHTML = savedAchievement;
+            }
+        }
+
+        // Перемешать вопросы
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+
+        // Показать вопрос
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionElement.textContent = question.question;
+            
+            optionsElement.innerHTML = '';
+            
+            // Перемешать варианты ответов
+            const shuffledOptions = [...question.options];
+            for (let i = shuffledOptions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+            }
+            
+            shuffledOptions.forEach((option, index) => {
+                const originalIndex = question.options.indexOf(option);
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option';
+                button.addEventListener('click', () => selectOption(originalIndex));
+                optionsElement.appendChild(button);
+            });
+            
+            resultElement.style.display = 'none';
+            nextButton.style.display = 'none';
+            
+            // Обновление прогресс-бара
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // Обновление номера вопроса
+            currentElement.textContent = currentQuestionIndex + 1;
+        }
+
+        // Выбор варианта ответа
+        function selectOption(index) {
+            const question = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            
+            // Отключить все кнопки
+            options.forEach(option => {
+                option.disabled = true;
+            });
+            
+            // Проверить ответ
+            if (index === question.answer) {
+                options.forEach((opt, i) => {
+                    if (question.options.indexOf(opt.textContent) === question.answer) {
+                        opt.classList.add('correct');
+                    }
+                });
+                resultElement.textContent = '✅ Правильно!';
+                score++;
+                scoreElement.textContent = score;
+            } else {
+                options.forEach((opt, i) => {
+                    if (question.options.indexOf(opt.textContent) === question.answer) {
+                        opt.classList.add('correct');
+                    } else if (question.options.indexOf(opt.textContent) === index) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+                resultElement.textContent = '❌ Неправильно!';
+            }
+            
+            resultElement.style.display = 'block';
+            nextButton.style.display = 'block';
+        }
+
+        // Следующий вопрос
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        // Завершение викторины
+        function endQuiz() {
+            quizCompleted = true;
+            
+            // Сохранить результаты
+            localStorage.setItem('quizScore', score);
+            localStorage.setItem('quizTotal', questions.length);
+            
+            // Определение достижения
+            const percentage = (score / questions.length) * 100;
+            let achievement = '';
+            
+            if (percentage === 100) {
+                achievement = '<div class="achievement-title">👑 БОГ ФУТБОЛА 👑</div><p>Ты знаешь о футболе ВСЁ! Ты настоящий футбольный гуру!</p>';
+                createConfetti(50);
+            } else if (percentage >= 90) {
+                achievement = '<div class="achievement-title">🏆 ЧЕМПИОН ЛИГИ ЧЕМПИОНОВ 🏆</div><p>Потрясающий результат! Ты настоящий эксперт!</p>';
+                createConfetti(40);
+            } else if (percentage >= 80) {
+                achievement = '<div class="achievement-title">⭐ МИСТЕР ЛИГА ЧЕМПИОНОВ ⭐</div><p>Отличные знания! Ты почти достиг вершины!</p>';
+                createConfetti(30);
+            } else if (percentage >= 70) {
+                achievement = '<div class="achievement-title">🔥 ГЕНИЙ НА ПОЛЕ 🔥</div><p>Хороший результат! Ты определенно разбираешься в футболе!</p>';
+                createConfetti(20);
+            } else if (percentage >= 60) {
+                achievement = '<div class="achievement-title">⚽ MVP МАТЧА ⚽</div><p>Неплохо! Ты показал достойную игру!</p>';
+                createConfetti(10);
+            } else if (percentage >= 50) {
+                achievement = '<div class="achievement-title">🌍 ЧЕМПИОН МИРА 🌍</div><p>Средний результат. Есть куда расти!</p>';
+            } else if (percentage >= 40) {
+                achievement = '<div class="achievement-title">🏅 МИСТЕР ЛАЛИГА 🏅</div><p>Неплохо, но нужно подтянуть знания!</p>';
+            } else if (percentage >= 30) {
+                achievement = '<div class="achievement-title">💰 БОГАЧЕ РЕАЛА 💰</div><p>Есть пробелы в знаниях, но ты на правильном пути!</p>';
+            } else {
+                achievement = '<div class="achievement-title">😅 НОВИЧОК 😅</div><p>Похоже, тебе нужно чаще смотреть футбол!</p>';
+            }
+            
+            achievementElement.innerHTML = achievement;
+            localStorage.setItem('quizAchievement', achievement);
+            
+            // Показать финальный экран
+            showFinalScreen();
+        }
+
+        // Создать конфетти
+        function createConfetti(count) {
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                document.body.appendChild(confetti);
+                
+                // Удалить конфетти после анимации
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Получить случайный цвет
+        function getRandomColor() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#FF8E8E', '#48D1CC', '#FFD700'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Обработчики событий
+        startBtn.addEventListener('click', () => {
+            if (hasPlayed) {
+                showFinalScreen();
+            } else {
+                titleScreen.style.display = 'none';
+                gameScreen.style.display = 'block';
+                initQuiz();
+            }
+        });
+        
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', () => {
+            showFinalScreen();
+        });
+
+        // Инициализация при загрузке
+        totalElement.textContent = questions.length;
+    </script>
+</body>
+              </html>
